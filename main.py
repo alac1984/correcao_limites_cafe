@@ -1,5 +1,4 @@
 import httpx
-import xml.etree.ElementTree as ET
 
 from models import Auditor
 from settings import Settings, Environment
@@ -13,38 +12,6 @@ HEADERS = {
 CODIGO_SETOR = "10313024"
 
 # 1. Pegar as matrículas dos auditores de um setor
-body = f"""
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <tem:getEntities>
-            <!--Optional:-->
-            <tem:entitiesInfo>
-                <BizAgiWSParam>
-                    <EntityData>
-                        <EntityName>DadosdoFiscal</EntityName>
-                        <Filters>CodigodoOrgaoProvisorio = {CODIGO_SETOR} AND CargoFuncaoComissao = 3247</Filters>
-                    </EntityData>
-                </BizAgiWSParam>
-            </tem:entitiesInfo>
-        </tem:getEntities>
-    </soapenv:Body>
-</soapenv:Envelope>
-"""
-response = httpx.post(settings.bizagi_url + "WebServices/EntityManagerSOA.asmx", content=body, headers=HEADERS)
-# Parse o XML usando ElementTree
-root = ET.fromstring(response.text)
-
-# Extrair todas as matrículas
-matriculas = root.findall('.//NumerodaMatricula')
-
-# 2. Criar uma string estilo tupla pra chamar o outro método com ela
-matriculasString = "("
-for matricula in matriculas:
-    matriculasString += f"'{matricula.text}', "
-
-# Remover a última vírgula e espaço e fechar o parêntese
-matriculasString = matriculasString.rstrip(", ") + ")"
 
 # 3. Pegar os WFUSERs
 # MUDEI O VALOR DE MATRICULASSTRING PRA NÃO ESTRESSAR O SERVIDOR DE PRODUÇÃO
